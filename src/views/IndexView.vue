@@ -10,38 +10,7 @@
                     <p class="mt-1 text-sm text-slate-500">Manage your daily logged hours and tasks</p>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <button
-                        type="button"
-                        class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-                        @click="changeDate(-1)"
-                    >
-                        ←
-                    </button>
-
-                    <input
-                        v-model="selectedDate"
-                        type="date"
-                        class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                        @change="fetchTimeEntries"
-                    />
-
-                    <button
-                        type="button"
-                        class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-                        @click="changeDate(1)"
-                    >
-                        →
-                    </button>
-
-                    <button
-                        type="button"
-                        class="ml-2 rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-100"
-                        @click="setToday"
-                    >
-                        Today
-                    </button>
-                </div>
+                <date-picker @fetch="fetchTimeEntries" :date="todaysDate"></date-picker>
             </header>
 
             <!-- Main Content Area -->
@@ -157,10 +126,11 @@
 import {onMounted, ref} from 'vue';
 
 import {deleteTimeEntry, getTimeEntries} from '@/api/productive';
+import DatePicker from '@/components/DatePicker.vue';
 import {useAuthStore} from '@/stores/auth';
 
 // State
-const selectedDate = ref(new Date().toISOString().split('T', 1)[0]!);
+const todaysDate = new Date().toISOString().split('T', 1)[0]!;
 const timeEntries = ref<any[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
@@ -181,13 +151,16 @@ function formatDuration(minutes: number | string): string {
 const authStore = useAuthStore();
 
 // Fetch Entries
-const fetchTimeEntries = async () => {
+const fetchTimeEntries = async (date?: string) => {
+    console.log(date);
+    date ||= todaysDate;
+
     loading.value = true;
     error.value = null;
 
     try {
         // Calling getTimeEntries directly from productive.ts
-        const entries = await getTimeEntries(selectedDate.value, authStore.personId);
+        const entries = await getTimeEntries(date, authStore.personId);
         timeEntries.value = Array.isArray(entries) ? entries : [];
     } catch (error_) {
         error.value = error_ instanceof Error ? error_.message : 'Failed to fetch time entries';
@@ -195,19 +168,6 @@ const fetchTimeEntries = async () => {
         loading.value = false;
     }
 };
-
-// Date Navigation Controls
-function changeDate(days: number) {
-    const current = new Date(selectedDate.value);
-    current.setDate(current.getDate() + days);
-    selectedDate.value = current.toISOString().split('T', 1)[0]!;
-    void fetchTimeEntries();
-}
-
-function setToday() {
-    selectedDate.value = new Date().toISOString().split('T', 1)[0]!;
-    void fetchTimeEntries();
-}
 
 // Delete Logic
 function promptDelete(entry: any) {
