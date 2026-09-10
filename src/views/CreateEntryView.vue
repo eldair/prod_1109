@@ -40,10 +40,11 @@ const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 const formRef = useTemplateRef('formRef');
-const today = new Date().toISOString().split('T', 1)[0]!;
 const services = ref<Service[]>([]);
 const loading = ref(true);
 const loadError = ref('');
+
+const today = new Date().toISOString().split('T', 1)[0]!;
 const initialDate = typeof route.query.date === 'string' && route.query.date <= today ? route.query.date : today;
 
 async function loadServices() {
