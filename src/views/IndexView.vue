@@ -10,7 +10,7 @@
                     <p class="mt-1 text-sm text-slate-500">Manage your daily logged hours and tasks</p>
                 </div>
 
-                <date-picker @fetch="fetchTimeEntries" :date="todaysDate"></date-picker>
+                <date-picker @fetch="fetchTimeEntries" :today="todaysDate" :date="selectedDate"></date-picker>
             </header>
 
             <!-- Main Content Area -->
@@ -66,15 +66,13 @@
                                 <span
                                     class="inline-flex items-center rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 ring-1 ring-inset ring-blue-700/10"
                                 >
-                                    {{ formatDuration(entry.attributes?.time || entry.duration) }}
+                                    {{ formatDuration(entry.duration) }}
                                 </span>
-                                <span class="text-xs text-slate-400"
-                                    >Date: {{ entry.attributes?.date || entry.date }}</span
-                                >
+                                <span class="text-xs text-slate-400">Date: {{ entry.date }}</span>
                             </div>
 
                             <p class="text-sm font-normal whitespace-pre-line text-slate-800">
-                                {{ entry.attributes?.note || entry.description || 'No description provided' }}
+                                {{ entry.description || 'No description provided' }}
                             </p>
                         </div>
 
@@ -83,11 +81,18 @@
                         >
                             <button
                                 type="button"
-                                class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 hover:border-red-200"
+                                class="rounded-lg border cursor-pointer border-slate-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 hover:border-red-200"
                                 @click="promptDelete(entry)"
                             >
                                 Delete
                             </button>
+                            <router-link
+                                v-if="entry.id"
+                                :to="`/entries/${entry.id}/edit`"
+                                class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-blue-600 transition hover:border-blue-200 hover:bg-blue-50"
+                            >
+                                Edit
+                            </router-link>
                         </div>
                     </article>
                 </div>
@@ -108,7 +113,7 @@
                         <button
                             type="button"
                             :disabled="deletingLoading"
-                            class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                            class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50 cursor-pointer"
                             @click="deletingEntry = null"
                         >
                             Cancel
@@ -116,7 +121,7 @@
                         <button
                             type="button"
                             :disabled="deletingLoading"
-                            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
+                            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50 cursor-pointer"
                             @click="confirmDelete"
                         >
                             {{ deletingLoading ? 'Deleting...' : 'Delete' }}
@@ -129,25 +134,34 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from 'vue';
+import {onMounted, watch, ref} from 'vue';
+import {useRoute} from 'vue-router';
 
-import {deleteTimeEntry, getTimeEntries} from '@/api/productive';
+import {deleteTimeEntry, getTimeEntries, type TimeEntry} from '@/api/productive';
 import DatePicker from '@/components/DatePicker.vue';
 import {useAuthStore} from '@/stores/auth';
 
 // State
 const todaysDate = new Date().toISOString().split('T', 1)[0]!;
-const timeEntries = ref<any[]>([]);
+const route = useRoute();
+
+function getInitialDate(): string {
+    const queryDate = route.query.date;
+    return typeof queryDate === 'string' && queryDate <= todaysDate ? queryDate : todaysDate;
+}
+
+const selectedDate = ref(getInitialDate());
+const timeEntries = ref<TimeEntry[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
 // Modal State
-const deletingEntry = ref<string | null>(null);
+const deletingEntry = ref<TimeEntry | null>(null);
 const deletingLoading = ref(false);
 
 // Helper to format minutes into HH:MM
 function formatDuration(minutes: number | string): string {
-    const num = typeof minutes === 'string' ? parseInt(minutes, 10) : minutes;
+    const num = typeof minutes === 'string' ? Number(minutes) : minutes;
     if (isNaN(num)) return '0m';
     const hrs = Math.floor(num / 60);
     const mins = num % 60;
@@ -158,8 +172,8 @@ const authStore = useAuthStore();
 
 // Fetch Entries
 const fetchTimeEntries = async (date?: string) => {
-    console.log(date);
-    date ||= todaysDate;
+    date ||= selectedDate.value;
+    selectedDate.value = date;
 
     loading.value = true;
     error.value = null;
@@ -176,22 +190,22 @@ const fetchTimeEntries = async (date?: string) => {
 };
 
 // Delete Logic
-function promptDelete(entry: any) {
+function promptDelete(entry: TimeEntry) {
     deletingEntry.value = entry;
 }
 
 async function confirmDelete() {
     if (!deletingEntry.value) return;
 
+    const entry = deletingEntry.value;
     deletingLoading.value = true;
 
     try {
-        if (typeof deleteTimeEntry === 'function') {
-            await deleteTimeEntry(deletingEntry.value.id);
-        }
+        if (!entry.id) throw new Error('Time entry is missing an id.');
 
+        await deleteTimeEntry(entry.id);
         // Remove item locally upon success
-        timeEntries.value = timeEntries.value.filter((e) => e.id !== deletingEntry.value.id);
+        timeEntries.value = timeEntries.value.filter((item) => item.id !== entry.id);
         deletingEntry.value = null;
     } catch (error_) {
         alert(error_ instanceof Error ? error_.message : 'Failed to delete entry.');
@@ -203,4 +217,14 @@ async function confirmDelete() {
 onMounted(() => {
     void fetchTimeEntries();
 });
+
+watch(
+    () => route.query.date,
+    (date) => {
+        if (typeof date !== 'string' || date > todaysDate || date === selectedDate.value) return;
+
+        selectedDate.value = date;
+        void fetchTimeEntries(date);
+    },
+);
 </script>

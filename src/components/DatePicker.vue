@@ -3,7 +3,7 @@
         <!-- Previous Day Button -->
         <button
             type="button"
-            class="rounded-lg border border-slate-300 bg-white p-2 text-slate-600 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-100 active:bg-slate-100"
+            class="rounded-lg border border-slate-300 bg-white p-2 text-slate-600 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-100 active:bg-slate-100 cursor-pointer"
             title="Previous day"
             @click="shiftDate(-1)"
         >
@@ -35,7 +35,7 @@
                 ref="dateInputRef"
                 v-model="selectedDate"
                 type="date"
-                :max="date"
+                :max="today"
                 class="pointer-events-none absolute inset-0 h-full w-full opacity-0"
                 @change="fetchTimeEntries"
             />
@@ -45,7 +45,7 @@
         <button
             type="button"
             :disabled="isToday"
-            class="rounded-lg border border-slate-300 bg-white p-2 text-slate-600 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-100 active:bg-slate-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-300"
+            class="rounded-lg border border-slate-300 bg-white p-2 text-slate-600 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-100 active:bg-slate-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-300 cursor-pointer"
             title="Next day"
             @click="shiftDate(1)"
         >
@@ -60,12 +60,12 @@
 import {useTemplateRef, computed, ref} from 'vue';
 
 // @note: could implement validation to check for proper format
-const props = defineProps<{date: string}>();
+const props = defineProps<{today: string; date: string}>();
 
 const selectedDate = ref<string>(props.date);
 const dateInputRef = useTemplateRef<HTMLInputElement>('dateInputRef');
 
-const isToday = computed(() => selectedDate.value >= props.date);
+const isToday = computed(() => selectedDate.value >= props.today);
 
 // Reformats date for display in human form
 const formattedDisplayDate = computed(() => {
@@ -89,7 +89,7 @@ function shiftDate(days: number) {
     const formattedStr = `${y}-${m}-${d}`;
 
     // Prevent shifting past today
-    if (formattedStr > props.date) return;
+    if (formattedStr > props.today) return;
 
     selectedDate.value = formattedStr;
     fetchTimeEntries();
