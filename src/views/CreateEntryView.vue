@@ -23,8 +23,8 @@
 </template>
 
 <script setup lang="ts">
+import {useTemplateRef, onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
-import {onMounted, ref} from 'vue';
 
 import {type TimeEntryInput, createTimeEntry, type Service, getServices} from '@/api/productive';
 import TimeEntryForm from '@/components/TimeEntryForm.vue';
@@ -32,7 +32,7 @@ import {useAuthStore} from '@/stores/auth';
 
 const router = useRouter();
 const authStore = useAuthStore();
-const formRef = ref<InstanceType<typeof TimeEntryForm>>();
+const formRef = useTemplateRef('formRef');
 const services = ref<Service[]>([]);
 const loading = ref(true);
 const loadError = ref('');
