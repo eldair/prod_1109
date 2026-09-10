@@ -16,14 +16,14 @@ const router = createRouter({
             component: () => import('../views/LoginView.vue'),
         },
         {
-            path: '/entries/new',
-            name: 'newEntry',
-            component: () => import('../views/TimeEntryView.vue'),
+            path: '/entries/create',
+            name: 'createEntry',
+            component: () => import('../views/CreateEntryView.vue'),
         },
         {
             path: '/entries/:id/edit',
             name: 'editEntry',
-            component: () => import('../views/TimeEntryView.vue'),
+            component: () => import('../views/EditEntryView.vue'),
             props: true,
         },
     ],

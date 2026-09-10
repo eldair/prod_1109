@@ -15,6 +15,12 @@
 
             <!-- Main Content Area -->
             <main>
+                <router-link
+                    to="/entries/create"
+                    class="mb-4 block w-full rounded-lg border border-blue-600 bg-white px-4 py-2.5 text-center text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
+                >
+                    Create New Entry
+                </router-link>
                 <!-- Loading State -->
                 <div
                     v-if="loading"
