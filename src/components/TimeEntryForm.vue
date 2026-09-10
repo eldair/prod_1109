@@ -14,6 +14,20 @@
             />
             <p v-if="errors.duration" class="mt-1 text-sm text-red-600">{{ errors.duration }}</p>
         </div>
+        <div v-if="showServiceSelect">
+            <label for="entry-service" class="mb-2 block text-sm font-medium text-slate-700">Service</label>
+            <select
+                id="entry-service"
+                v-model="form.serviceId"
+                required
+                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                :aria-invalid="Boolean(errors.serviceId)"
+            >
+                <option value="" disabled>Select a service</option>
+                <option v-for="service in services" :key="service.id" :value="service.id">{{ service.name }}</option>
+            </select>
+            <p v-if="errors.serviceId" class="mt-1 text-sm text-red-600">{{ errors.serviceId }}</p>
+        </div>
         <div>
             <label for="entry-description" class="mb-2 block text-sm font-medium text-slate-700">Description</label>
             <textarea
@@ -63,35 +77,48 @@
 <script setup lang="ts">
 import {reactive, ref} from 'vue';
 
-import type {TimeEntryInput} from '@/api/productive';
+import type {TimeEntryInput, Service} from '@/api/productive';
 
-const props = withDefaults(defineProps<{entry?: TimeEntryInput; submitLabel?: string}>(), {
-    submitLabel: 'Create Entry',
-});
+const props = withDefaults(
+    defineProps<{
+        entry?: TimeEntryInput;
+        services?: Service[];
+        showServiceSelect?: boolean;
+        submitLabel?: string;
+    }>(),
+    {services: () => [], showServiceSelect: true, submitLabel: 'Create Entry'},
+);
 const emit = defineEmits<{submit: [input: TimeEntryInput]}>();
 const form = reactive<TimeEntryInput>({
     duration: props.entry?.duration ?? 0,
     description: props.entry?.description ?? '',
     date: props.entry?.date ?? new Date().toISOString().split('T', 1)[0]!,
+    serviceId: props.entry?.serviceId ?? '',
 });
 const errors = reactive<Partial<Record<keyof TimeEntryInput, string>>>({});
 const submitError = ref('');
 const submitting = ref(false);
 const today = new Date().toISOString().split('T', 1)[0]!;
+const {showServiceSelect} = props;
 
 function validate() {
     errors.duration =
         form.duration > 0 && Number.isSafeInteger(Number(form.duration)) ? '' : 'Enter a duration in whole minutes.';
     errors.description = form.description.trim() ? '' : 'Enter a description.';
     errors.date = form.date ? (form.date > today ? 'Date cannot be in the future.' : '') : 'Select a date.';
-    return !errors.duration && !errors.description && !errors.date;
+    errors.serviceId = showServiceSelect && !form.serviceId ? 'Select a service.' : '';
+    return !errors.duration && !errors.description && !errors.date && !errors.serviceId;
 }
 
 function submitForm() {
     submitError.value = '';
     if (!validate()) return;
     submitting.value = true;
-    emit('submit', {...form, description: form.description.trim()});
+    emit('submit', {
+        ...form,
+        description: form.description.trim(),
+        serviceId: props.entry?.serviceId ?? form.serviceId,
+    });
 }
 
 function setSubmitError(message: string) {
