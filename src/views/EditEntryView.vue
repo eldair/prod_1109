@@ -70,7 +70,7 @@ async function saveEntry(input: TimeEntryInput) {
     console.log(input);
     try {
         await updateTimeEntry(String(route.params.id), input, authStore.personId);
-        await router.push('/');
+        await router.push({path: '/', query: {date: input.date}});
     } catch (error) {
         formRef.value?.setSubmitError(error instanceof Error ? error.message : 'Failed to update time entry.');
     }

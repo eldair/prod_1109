@@ -1,54 +1,48 @@
-# productive
+# Productive Time Tracker
 
-This template should help get you started developing with Vue 3 in Vite.
+A client-side Vue application for managing Productive time entries.
 
-## Recommended IDE Setup
+## Features
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- View time entries for a selected day.
+- Create, edit, and delete time entries.
+- Select the associated Productive service when creating or editing an entry.
+- Validate duration, description, date, and required service values.
+- Display loading, validation, and API errors.
+- Preserve the selected date in the URL and browser history.
+- Authenticate with a Productive API token and organization ID.
 
-## Recommended Browser Setup
+## Requirements
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+- Node.js 22.18+ or Node.js 24.12+
+- pnpm 12+
+- A Productive test account, API token, organization ID, and access to time-entry services
 
-## Type Support for `.vue` Imports in TS
+## Setup
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
+```bash
 pnpm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 pnpm dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Open the local URL printed by Vite and provide your Productive API token and organization ID.
 
-```sh
+## Validation
+
+```bash
+pnpm type-check
+pnpm lint
 pnpm build
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+## API configuration
 
-```sh
-pnpm test:unit
+The application communicates directly with the Productive API from the browser. Authentication headers are added by the Axios client using credentials stored in Pinia. Write requests use the JSON:API media type required by Productive:
+
+```text
+application/vnd.api+json
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+The API requires a `service_id` for time-entry creation and updates, so the form loads available services and submits the selected service ID.
 
-```sh
-pnpm lint
-```
+See [TECHNICAL-SPECIFICATION.md](./TECHNICAL-SPECIFICATION.md) for the architecture and implementation decisions.
