@@ -6,8 +6,8 @@
             </RouterLink>
             <button
                 type="button"
-                class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-                @click="authStore.logout"
+                class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 cursor-pointer"
+                @click="logout"
             >
                 Log out
             </button>
@@ -20,9 +20,15 @@
 </template>
 
 <script setup lang="ts">
-import {RouterLink, RouterView} from 'vue-router';
+import {RouterLink, RouterView, useRouter} from 'vue-router';
 
 import {useAuthStore} from '@/stores/auth';
 
 const authStore = useAuthStore();
+const router = useRouter();
+
+function logout() {
+    authStore.logout();
+    void router.push({name: 'login'});
+}
 </script>

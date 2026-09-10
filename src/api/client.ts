@@ -1,6 +1,7 @@
 import axios, {AxiosError} from 'axios';
 
 import {useAuthStore} from '@/stores/auth';
+import router from '@/router';
 
 export const api = axios.create({
     baseURL: 'https://api.productive.io/api/v2',
@@ -24,7 +25,11 @@ api.interceptors.response.use(
     (error: AxiosError) => {
         if (error.response?.status === 401) {
             const authStore = useAuthStore();
-            authStore.logout();
+            authStore.clearAuth();
+
+            if (router.currentRoute.value.name !== 'login') {
+                void router.push({name: 'login'});
+            }
         }
 
         return Promise.reject(error);

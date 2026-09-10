@@ -67,7 +67,6 @@ async function loadEntry() {
 }
 
 async function saveEntry(input: TimeEntryInput) {
-    console.log(input);
     try {
         await updateTimeEntry(String(route.params.id), input, authStore.personId);
         await router.push({path: '/', query: {date: input.date}});

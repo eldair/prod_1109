@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/no-this-outside-of-class */
-import {useRouter} from 'vue-router';
+/* eslint-disable unicorn/no-this-outside-of-class */
 import {defineStore} from 'pinia';
 
 export interface AuthState {
@@ -34,7 +34,7 @@ export const useAuthStore = defineStore('auth', {
                 this.organizationId = data.organizationId ?? '';
                 this.personId = data.personId ?? '';
             } catch {
-                this.logout();
+                this.clearAuth();
             }
         },
 
@@ -46,18 +46,16 @@ export const useAuthStore = defineStore('auth', {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
         },
 
-        logout() {
+        clearAuth() {
             this.token = '';
             this.organizationId = '';
             this.personId = '';
 
             localStorage.removeItem(STORAGE_KEY);
+        },
 
-            const router = useRouter();
-
-            if (router.currentRoute.value.path !== '/login') {
-                void router.push('/login');
-            }
+        logout() {
+            this.clearAuth();
         },
     },
 });
