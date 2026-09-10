@@ -40,7 +40,7 @@ type SourceService = {
 // @note should cache
 export async function getTimeEntries(date: string, personId: string): Promise<TimeEntry[]> {
     try {
-        // @note: we should be implementing pagination here but it is out of scope
+        // @note we should be implementing pagination here but it is out of scope
         const response = await api.get<{data: SourceTimeEntry[]}>('time_entries', {
             params: {'filter[creator_id]': personId, 'filter[date]': date, include: 'service'},
         });
@@ -65,7 +65,7 @@ export async function getTimeEntry(entryId: string): Promise<TimeEntry> {
         const response = await api.get<{data: SourceTimeEntry}>(`time_entries/${entryId}`, {
             params: {include: 'service'},
         });
-        // @note: we could validate concrete response and if data.data is missing and show different error according to
+        // @note we could validate concrete response and if data.data is missing and show different error according to
         // that
         const entry = response.data.data;
         return toTimeEntry(entry);

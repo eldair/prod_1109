@@ -59,7 +59,7 @@
 <script setup lang="ts">
 import {useTemplateRef, computed, ref} from 'vue';
 
-// @note: could implement validation to check for proper format
+// @note could implement validation to check for proper format
 const props = defineProps<{today: string; date: string}>();
 
 const selectedDate = ref<string>(props.date);
@@ -80,7 +80,7 @@ function shiftDate(days: number) {
     currentDate.setDate(currentDate.getDate() + days);
 
     // Extract local year, month, and day to avoid UTC offset shifts
-    // @note: could have used luxon/date but for avoiding additional libraries it is done like this. Temporal API will
+    // @note could have used luxon/date but for avoiding additional libraries it is done like this. Temporal API will
     // fix this
     const y = currentDate.getFullYear();
     const m = String(currentDate.getMonth() + 1).padStart(2, '0');

@@ -7,6 +7,7 @@
                 v-model="form.duration"
                 type="number"
                 min="1"
+                max="1440"
                 step="1"
                 required
                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -104,9 +105,12 @@ const submitting = ref(false);
 const today = new Date().toISOString().split('T', 1)[0]!;
 const {showServiceSelect} = props;
 
+// @note can user have time entry longer than 24h in single day?
 function validate() {
     errors.duration =
-        form.duration > 0 && Number.isSafeInteger(Number(form.duration)) ? '' : 'Enter a duration in whole minutes.';
+        form.duration > 0 && form.duration <= 1440 && Number.isSafeInteger(Number(form.duration))
+            ? ''
+            : 'Enter a duration between 1 and 1,440 minutes.';
     errors.description = form.description.trim() ? '' : 'Enter a description.';
     errors.date = form.date ? (form.date > today ? 'Date cannot be in the future.' : '') : 'Select a date.';
     errors.serviceId = showServiceSelect && !form.serviceId ? 'Select a service.' : '';
