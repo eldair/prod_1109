@@ -70,6 +70,7 @@ API failures are converted into user-facing messages by the shared API error hel
 - Browser history is used for date changes and form cancellation.
 - Services are loaded on create and edit because the API requires a service ID even though the assignment's minimum entry fields do not explicitly mention services.
 - The application does not implement service management because services are reference data owned by Productive.
+- Time entries are filtered with `person_id` and `date` rather than the assignment's suggested `after` and `before` filters. The list is grouped by the entry's logged calendar date (`attributes.date`), while `after` and `before` filter timestamp fields such as creation or activity time. Using the timestamp filters can therefore return an entry logged for a previous date when it was created or updated today. This should be revisited if Productive clarifies different filter semantics for the endpoint.
 
 ## Out of scope and trade-offs
 

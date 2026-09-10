@@ -42,7 +42,7 @@ export async function getTimeEntries(date: string, personId: string): Promise<Ti
     try {
         // @note we should be implementing pagination here but it is out of scope
         const response = await api.get<{data: SourceTimeEntry[]}>('time_entries', {
-            params: {'filter[creator_id]': personId, 'filter[date]': date, include: 'service'},
+            params: {'filter[person_id]': personId, 'filter[date]': date, include: 'service'},
         });
 
         return response.data.data.map((entry) => toTimeEntry(entry));
