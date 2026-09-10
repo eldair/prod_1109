@@ -57,16 +57,17 @@
             {{ submitError }}
         </p>
         <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <router-link
-                to="/"
-                class="rounded-lg border border-slate-300 px-4 py-2 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+            <button
+                type="button"
+                class="rounded-lg border border-slate-300 px-4 py-2 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-50 cursor-pointer"
+                @click="router.back()"
             >
                 Cancel
-            </router-link>
+            </button>
             <button
                 type="submit"
                 :disabled="submitting"
-                class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
             >
                 {{ submitting ? 'Saving...' : submitLabel }}
             </button>
@@ -75,6 +76,7 @@
 </template>
 
 <script setup lang="ts">
+import {useRouter} from 'vue-router';
 import {reactive, ref} from 'vue';
 
 import type {TimeEntryInput, Service} from '@/api/productive';
@@ -88,6 +90,7 @@ const props = withDefaults(
     }>(),
     {services: () => [], showServiceSelect: true, submitLabel: 'Create Entry'},
 );
+const router = useRouter();
 const emit = defineEmits<{submit: [input: TimeEntryInput]}>();
 const form = reactive<TimeEntryInput>({
     duration: props.entry?.duration ?? 0,

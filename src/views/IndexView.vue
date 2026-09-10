@@ -134,8 +134,8 @@
 </template>
 
 <script setup lang="ts">
+import {useRouter, useRoute} from 'vue-router';
 import {onMounted, watch, ref} from 'vue';
-import {useRoute} from 'vue-router';
 
 import {deleteTimeEntry, getTimeEntries, type TimeEntry} from '@/api/productive';
 import DatePicker from '@/components/DatePicker.vue';
@@ -144,6 +144,7 @@ import {useAuthStore} from '@/stores/auth';
 // State
 const todaysDate = new Date().toISOString().split('T', 1)[0]!;
 const route = useRoute();
+const router = useRouter();
 
 function getInitialDate(): string {
     const queryDate = route.query.date;
@@ -171,9 +172,13 @@ function formatDuration(minutes: number | string): string {
 const authStore = useAuthStore();
 
 // Fetch Entries
-const fetchTimeEntries = async (date?: string) => {
+const fetchTimeEntries = async (date?: string, updateUrl = true) => {
     date ||= selectedDate.value;
     selectedDate.value = date;
+
+    if (updateUrl && route.query.date !== date) {
+        await router.push({query: {...route.query, date}});
+    }
 
     loading.value = true;
     error.value = null;
@@ -215,7 +220,7 @@ async function confirmDelete() {
 }
 
 onMounted(() => {
-    void fetchTimeEntries();
+    void fetchTimeEntries(undefined, false);
 });
 
 watch(
@@ -224,7 +229,7 @@ watch(
         if (typeof date !== 'string' || date > todaysDate || date === selectedDate.value) return;
 
         selectedDate.value = date;
-        void fetchTimeEntries(date);
+        void fetchTimeEntries(date, false);
     },
 );
 </script>
