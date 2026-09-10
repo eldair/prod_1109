@@ -21,8 +21,7 @@
                 v-else-if="entry"
                 ref="formRef"
                 :entry="entry"
-                :service-name="serviceName"
-                :show-service-select="false"
+                :services="services"
                 submit-label="Save Changes"
                 @submit="saveEntry"
             />
@@ -34,7 +33,14 @@
 import {useTemplateRef, onMounted, ref} from 'vue';
 import {useRouter, useRoute} from 'vue-router';
 
-import {type TimeEntryInput, updateTimeEntry, type TimeEntry, getTimeEntry} from '@/api/productive';
+import {
+    type TimeEntryInput,
+    updateTimeEntry,
+    type TimeEntry,
+    getTimeEntry,
+    type Service,
+    getServices,
+} from '@/api/productive';
 import TimeEntryForm from '@/components/TimeEntryForm.vue';
 import {useAuthStore} from '@/stores/auth';
 
@@ -43,13 +49,16 @@ const router = useRouter();
 const authStore = useAuthStore();
 const formRef = useTemplateRef('formRef');
 const entry = ref<TimeEntry>();
-const serviceName = ref('');
+const services = ref<Service[]>([]);
 const loading = ref(true);
 const loadError = ref('');
 
 async function loadEntry() {
     try {
-        entry.value = await getTimeEntry(String(route.params.id));
+        const metadata = await Promise.all([getTimeEntry(String(route.params.id)), getServices()]);
+
+        entry.value = metadata[0];
+        services.value = metadata[1];
     } catch (error) {
         loadError.value = error instanceof Error ? error.message : 'Failed to load time entry.';
     } finally {
@@ -58,6 +67,7 @@ async function loadEntry() {
 }
 
 async function saveEntry(input: TimeEntryInput) {
+    console.log(input);
     try {
         await updateTimeEntry(String(route.params.id), input, authStore.personId);
         await router.push('/');

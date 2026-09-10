@@ -37,7 +37,7 @@ type SourceService = {
         name: string;
     };
 };
-
+// @note should cache
 export async function getTimeEntries(date: string, personId: string): Promise<TimeEntry[]> {
     try {
         // @note: we should be implementing pagination here but it is out of scope
@@ -50,7 +50,7 @@ export async function getTimeEntries(date: string, personId: string): Promise<Ti
         throw new Error(getApiErrorMessage(error));
     }
 }
-
+// @note should cache
 export async function getServices(): Promise<Service[]> {
     try {
         const response = await api.get<{data: SourceService[]}>('services');

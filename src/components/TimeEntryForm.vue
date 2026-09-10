@@ -117,7 +117,6 @@ function submitForm() {
     emit('submit', {
         ...form,
         description: form.description.trim(),
-        serviceId: props.entry?.serviceId ?? form.serviceId,
     });
 }
 
