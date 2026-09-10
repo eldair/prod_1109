@@ -1,31 +1,23 @@
 <template>
-    <div class="min-h-screen bg-slate-50 p-4 sm:p-8">
-        <div class="mx-auto max-w-2xl space-y-6">
-            <header>
-                <h1 class="text-2xl font-bold text-slate-900">Edit Time Entry</h1>
-                <p class="mt-1 text-sm text-slate-500">Update the details for this time entry.</p>
-            </header>
-            <div
-                v-if="loading"
-                class="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm"
-            >
-                Loading entry...
-            </div>
-            <p
-                v-else-if="loadError"
-                class="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 shadow-sm"
-            >
-                {{ loadError }}
-            </p>
-            <time-entry-form
-                v-else-if="entry"
-                ref="formRef"
-                :entry="entry"
-                :services="services"
-                submit-label="Save Changes"
-                @submit="saveEntry"
-            />
+    <div class="mx-auto max-w-2xl space-y-6">
+        <header>
+            <h1 class="text-2xl font-bold text-slate-900">Edit Time Entry</h1>
+            <p class="mt-1 text-sm text-slate-500">Update the details for this time entry.</p>
+        </header>
+        <div v-if="loading" class="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
+            Loading entry...
         </div>
+        <p v-else-if="loadError" class="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 shadow-sm">
+            {{ loadError }}
+        </p>
+        <time-entry-form
+            v-else-if="entry"
+            ref="formRef"
+            :entry="entry"
+            :services="services"
+            submit-label="Save Changes"
+            @submit="saveEntry"
+        />
     </div>
 </template>
 

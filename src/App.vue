@@ -1,6 +1,6 @@
 <template>
     <header v-if="authStore.isAuthenticated" class="border-b border-slate-200 bg-white shadow-sm">
-        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-8">
+        <div class="mx-auto flex items-center justify-between px-4 py-4 sm:px-8 max-w-6xl">
             <RouterLink to="/" class="text-xl font-bold text-slate-900 transition hover:text-blue-600">
                 Productive
             </RouterLink>
