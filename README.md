@@ -46,3 +46,12 @@ application/vnd.api+json
 The API requires a `service_id` for time-entry creation and updates, so the form loads available services and submits the selected service ID.
 
 See [TECHNICAL-SPECIFICATION.md](./TECHNICAL-SPECIFICATION.md) for the architecture and implementation decisions.
+
+## Out of scope
+
+The implementation intentionally leaves several production-hardening concerns out of scope:
+
+- The API token is stored in `localStorage` to support a client-only application. This is not as secure as an `HttpOnly` cookie because an XSS vulnerability could expose it. An `HttpOnly` token would require a server-side integration, which is outside this assignment.
+- Productive services and time entries are paginated, but the application currently uses the returned page rather than implementing pagination controls and page loading.
+- Requests are not cached or deduplicated. Services and entries are fetched on demand.
+- Automated unit, component, and end-to-end tests were not added because the assignment prioritizes the core API-backed user flow. The available baseline checks are `pnpm type-check`, `pnpm lint`, and `pnpm build`.

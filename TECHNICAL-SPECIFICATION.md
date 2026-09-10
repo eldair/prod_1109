@@ -68,3 +68,12 @@ API failures are converted into user-facing messages by the shared API error hel
 - Browser history is used for date changes and form cancellation.
 - Services are loaded on create and edit because the API requires a service ID even though the assignment's minimum entry fields do not explicitly mention services.
 - The application does not implement service management because services are reference data owned by Productive.
+
+## Out of scope and trade-offs
+
+The following items were intentionally not implemented to keep the solution within the assignment's scope and time constraints:
+
+- **Token security:** The API token is persisted in `localStorage` so the client can restore the session after a refresh. This is vulnerable to theft if the application has an XSS vulnerability. A production architecture would use a server-side integration and an `HttpOnly`, `Secure`, appropriately scoped cookie, but the assignment does not include a server component.
+- **Pagination:** Productive returns paginated collections for services and time entries. The application currently consumes the returned page only. A production implementation should follow pagination metadata and load additional pages when needed.
+- **Caching:** Services and time entries are fetched on demand. The application does not implement a cache or request deduplication layer. A production implementation could cache services for the session and cache or invalidate time-entry queries after mutations.
+- **Automated tests:** A full unit, component, and end-to-end test suite was not added. Given the small assignment scope effort was prioritized for the complete user flow and API integration. Type-checking, linting, and production builds remain the intended baseline validation commands.
