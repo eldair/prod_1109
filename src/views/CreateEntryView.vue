@@ -5,22 +5,47 @@
                 <h1 class="text-2xl font-bold text-slate-900">Create Time Entry</h1>
                 <p class="mt-1 text-sm text-slate-500">Log the time you spent on a task.</p>
             </header>
-            <time-entry-form ref="formRef" @submit="createEntry" />
+            <div
+                v-if="loading"
+                class="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm"
+            >
+                Loading services...
+            </div>
+            <p
+                v-else-if="loadError"
+                class="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 shadow-sm"
+            >
+                {{ loadError }}
+            </p>
+            <time-entry-form v-else ref="formRef" :services="services" @submit="createEntry" />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import {useRouter} from 'vue-router';
-import {ref} from 'vue';
+import {onMounted, ref} from 'vue';
 
-import {type TimeEntryInput, createTimeEntry} from '@/api/productive';
+import {type TimeEntryInput, createTimeEntry, type Service, getServices} from '@/api/productive';
 import TimeEntryForm from '@/components/TimeEntryForm.vue';
 import {useAuthStore} from '@/stores/auth';
 
 const router = useRouter();
 const authStore = useAuthStore();
 const formRef = ref<InstanceType<typeof TimeEntryForm>>();
+const services = ref<Service[]>([]);
+const loading = ref(true);
+const loadError = ref('');
+
+async function loadServices() {
+    try {
+        services.value = await getServices();
+    } catch (error) {
+        loadError.value = error instanceof Error ? error.message : 'Failed to load services.';
+    } finally {
+        loading.value = false;
+    }
+}
 
 async function createEntry(input: TimeEntryInput) {
     try {
@@ -30,4 +55,6 @@ async function createEntry(input: TimeEntryInput) {
         formRef.value?.setSubmitError(error instanceof Error ? error.message : 'Failed to create time entry.');
     }
 }
+
+onMounted(() => void loadServices());
 </script>

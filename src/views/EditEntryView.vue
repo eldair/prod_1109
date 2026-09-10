@@ -21,6 +21,8 @@
                 v-else-if="entry"
                 ref="formRef"
                 :entry="entry"
+                :service-name="serviceName"
+                :show-service-select="false"
                 submit-label="Save Changes"
                 @submit="saveEntry"
             />
@@ -29,8 +31,8 @@
 </template>
 
 <script setup lang="ts">
+import {useTemplateRef, onMounted, ref} from 'vue';
 import {useRouter, useRoute} from 'vue-router';
-import {onMounted, ref} from 'vue';
 
 import {type TimeEntryInput, updateTimeEntry, type TimeEntry, getTimeEntry} from '@/api/productive';
 import TimeEntryForm from '@/components/TimeEntryForm.vue';
@@ -39,8 +41,9 @@ import {useAuthStore} from '@/stores/auth';
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const formRef = ref<InstanceType<typeof TimeEntryForm>>();
+const formRef = useTemplateRef('formRef');
 const entry = ref<TimeEntry>();
+const serviceName = ref('');
 const loading = ref(true);
 const loadError = ref('');
 
