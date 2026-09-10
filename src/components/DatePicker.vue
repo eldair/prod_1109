@@ -35,7 +35,7 @@
                 ref="dateInputRef"
                 v-model="selectedDate"
                 type="date"
-                :max="todayDate"
+                :max="date"
                 class="pointer-events-none absolute inset-0 h-full w-full opacity-0"
                 @change="fetchTimeEntries"
             />
@@ -59,32 +59,29 @@
 <script setup lang="ts">
 import {useTemplateRef, computed, ref} from 'vue';
 
+// @note: could implement validation to check for proper format
 const props = defineProps<{date: string}>();
 
-const todayDate = ref<string>(props.date);
 const selectedDate = ref<string>(props.date);
-
 const dateInputRef = useTemplateRef<HTMLInputElement>('dateInputRef');
 
-// Check if currently selected date is today
-const isToday = computed(() => selectedDate.value >= todayDate.value);
+const isToday = computed(() => selectedDate.value >= props.date);
 
-// Formats YYYY-MM-DD into a human-readable string (e.g. "Sep 9, 2026")
+// Reformats date for display in human form
 const formattedDisplayDate = computed(() => {
     if (!selectedDate.value) return '';
-    const [year, month, day] = selectedDate.value.split('-').map(Number);
-    const date = new Date(year!, month! - 1, day);
-    return date.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
+    const date = new Date(`${selectedDate.value}T00:00`);
+    return date.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'});
 });
 
 // Shift date by +1 or -1 day
 function shiftDate(days: number) {
-    const [year, month, day] = selectedDate.value.split('-').map(Number);
-    // Constructs the date in local time
-    const currentDate = new Date(year!, month! - 1, day);
+    const currentDate = new Date(`${selectedDate.value}T00:00`);
     currentDate.setDate(currentDate.getDate() + days);
 
     // Extract local year, month, and day to avoid UTC offset shifts
+    // @note: could have used luxon/date but for avoiding additional libraries it is done like this. Temporal API will
+    // fix this
     const y = currentDate.getFullYear();
     const m = String(currentDate.getMonth() + 1).padStart(2, '0');
     const d = String(currentDate.getDate()).padStart(2, '0');
@@ -92,19 +89,18 @@ function shiftDate(days: number) {
     const formattedStr = `${y}-${m}-${d}`;
 
     // Prevent shifting past today
-    if (formattedStr > todayDate.value) return;
+    if (formattedStr > props.date) return;
 
     selectedDate.value = formattedStr;
     fetchTimeEntries();
 }
 
-// Programmatically trigger native popover
 function openDatePicker() {
     dateInputRef.value?.showPicker();
 }
 
 const emit = defineEmits<{
-    (e: 'fetch', date: string): void;
+    fetch: [date: string];
 }>();
 
 function fetchTimeEntries() {

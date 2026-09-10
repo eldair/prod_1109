@@ -33,7 +33,7 @@
                     <button
                         type="button"
                         class="mt-3 text-sm font-semibold underline hover:text-red-800"
-                        @click="fetchTimeEntries"
+                        @click="() => fetchTimeEntries()"
                     >
                         Try Again
                     </button>
