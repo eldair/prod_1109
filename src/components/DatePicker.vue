@@ -80,8 +80,8 @@ function shiftDate(days: number) {
     currentDate.setDate(currentDate.getDate() + days);
 
     // Extract local year, month, and day to avoid UTC offset shifts
-    // @note could have used luxon/date but for avoiding additional libraries it is done like this. Temporal API will
-    // fix this
+    // @note could have used luxon/date but for avoiding additional libraries it is done like this
+    // Temporal API will fix this
     const y = currentDate.getFullYear();
     const m = String(currentDate.getMonth() + 1).padStart(2, '0');
     const d = String(currentDate.getDate()).padStart(2, '0');
