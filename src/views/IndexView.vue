@@ -16,7 +16,7 @@
             <!-- Main Content Area -->
             <main>
                 <router-link
-                    to="/entries/create"
+                    :to="{path: '/entries/create', query: {date: selectedDate}}"
                     class="mb-4 block w-full rounded-lg border border-blue-600 bg-white px-4 py-2.5 text-center text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
                 >
                     Create New Entry

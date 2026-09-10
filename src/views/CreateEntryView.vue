@@ -17,25 +17,34 @@
             >
                 {{ loadError }}
             </p>
-            <time-entry-form v-else ref="formRef" :services="services" @submit="createEntry" />
+            <time-entry-form
+                v-else
+                ref="formRef"
+                :entry="{date: initialDate, duration: 0, description: '', serviceId: ''}"
+                :services="services"
+                @submit="createEntry"
+            />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import {useTemplateRef, onMounted, ref} from 'vue';
-import {useRouter} from 'vue-router';
+import {useRouter, useRoute} from 'vue-router';
 
 import {type TimeEntryInput, createTimeEntry, type Service, getServices} from '@/api/productive';
 import TimeEntryForm from '@/components/TimeEntryForm.vue';
 import {useAuthStore} from '@/stores/auth';
 
 const router = useRouter();
+const route = useRoute();
 const authStore = useAuthStore();
 const formRef = useTemplateRef('formRef');
+const today = new Date().toISOString().split('T', 1)[0]!;
 const services = ref<Service[]>([]);
 const loading = ref(true);
 const loadError = ref('');
+const initialDate = typeof route.query.date === 'string' && route.query.date <= today ? route.query.date : today;
 
 async function loadServices() {
     try {
