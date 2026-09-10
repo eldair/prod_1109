@@ -12,6 +12,8 @@ Productive Time Tracker is a client-side web application for viewing and managin
 
 The Productive API also requires `service_id` when creating or updating a time entry. The application therefore loads available services and exposes a service selector in both create and edit forms.
 
+Because `service_id` is required by the API, the application assumes every valid time entry has an associated service. An entry whose service relationship is missing is treated as an invalid API response rather than a supported user state.
+
 ## Architecture
 
 The application uses Vue 3, TypeScript, Vue Router, Pinia, Axios, and Tailwind CSS. There is no server-side application; the browser communicates directly with Productive's API.
@@ -76,4 +78,5 @@ The following items were intentionally not implemented to keep the solution with
 - **Token security:** The API token is persisted in `localStorage` so the client can restore the session after a refresh. This is vulnerable to theft if the application has an XSS vulnerability. A production architecture would use a server-side integration and an `HttpOnly`, `Secure`, appropriately scoped cookie, but the assignment does not include a server component.
 - **Pagination:** Productive returns paginated collections for services and time entries. The application currently consumes the returned page only. A production implementation should follow pagination metadata and load additional pages when needed.
 - **Caching:** Services and time entries are fetched on demand. The application does not implement a cache or request deduplication layer. A production implementation could cache services for the session and cache or invalidate time-entry queries after mutations.
-- **Automated tests:** A full unit, component, and end-to-end test suite was not added. Given the small assignment scope effort was prioritized for the complete user flow and API integration. Type-checking, linting, and production builds remain the intended baseline validation commands.
+- **Automated tests:** Automated unit, component, and end-to-end tests were intentionally omitted because the app has limited standalone business logic and the assignment prioritizes the complete API-backed user flow. Adding and configuring a test runner would add setup overhead without materially improving confidence for this small application. Manual QA, type-checking, linting, and production builds are the intended validation approach.
+- **Dedicated 404 route:** A separate application-level 404 screen was not added. Resource-not-found responses from the API are already converted into a visible error on the edit screen, which is sufficient for the assignment's supported flows.

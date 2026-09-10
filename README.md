@@ -47,6 +47,23 @@ The API requires a `service_id` for time-entry creation and updates, so the form
 
 See [TECHNICAL-SPECIFICATION.md](./TECHNICAL-SPECIFICATION.md) for the architecture and implementation decisions.
 
+## Manual QA checklist
+
+- [ ] Sign in with valid credentials and reach the entries list.
+- [ ] Confirm invalid credentials show a readable error.
+- [ ] View today's entries and navigate to a previous date.
+- [ ] Confirm changing dates updates the `?date=YYYY-MM-DD` URL query.
+- [ ] Refresh the list and confirm the selected date is preserved.
+- [ ] Create an entry with duration, description, date, and service.
+- [ ] Confirm successful creation returns to the submitted date and displays the new entry.
+- [ ] Edit an existing entry, including changing its date and service.
+- [ ] Confirm successful editing returns to the submitted date and displays the updated entry.
+- [ ] Cancel create and edit, confirming the previous list date is preserved.
+- [ ] Delete an entry and confirm it disappears from the list.
+- [ ] Confirm empty descriptions, future dates, durations over 1,440 minutes, and missing services are rejected.
+- [ ] Confirm loading and API errors are visible.
+- [ ] Log out and confirm protected routes return to the login screen.
+
 ## Out of scope
 
 The implementation intentionally leaves several production-hardening concerns out of scope:
@@ -54,4 +71,4 @@ The implementation intentionally leaves several production-hardening concerns ou
 - The API token is stored in `localStorage` to support a client-only application. This is not as secure as an `HttpOnly` cookie because an XSS vulnerability could expose it. An `HttpOnly` token would require a server-side integration, which is outside this assignment.
 - Productive services and time entries are paginated, but the application currently uses the returned page rather than implementing pagination controls and page loading.
 - Requests are not cached or deduplicated. Services and entries are fetched on demand.
-- Automated unit, component, and end-to-end tests were not added because the assignment prioritizes the core API-backed user flow. The available baseline checks are `pnpm type-check`, `pnpm lint`, and `pnpm build`.
+- Automated unit, component, and end-to-end tests were intentionally omitted because the app has limited standalone business logic and the assignment prioritizes the core API-backed user flow. The manual QA checklist above, together with `pnpm type-check`, `pnpm lint`, and `pnpm build`, provides the validation baseline for this assignment.
